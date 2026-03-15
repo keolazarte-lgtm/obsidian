@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSIDIAN - Mensajes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main: #050507; --primary-violet: #7c3aed; --accent-pink: #ec4899; --text-white: #ffffff; --text-dim: #71717a; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-main); color: var(--text-white); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Header */
+        .header-chat {
+            padding: 20px; border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); z-index: 10;
+        }
+        .header-chat h2 { margin: 0; font-size: 1.2rem; }
+        .btn-back { color: var(--accent-pink); text-decoration: none; font-size: 0.9rem; }
+
+        /* Layout tipo App (2 columnas en PC, 1 en móvil) */
+        .chat-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Lista de Contactos (Izquierda) */
+        .contacts-list {
+            width: 100%; 
+            overflow-y: auto; 
+            border-right: 1px solid #111;
+        }
+        /* En PC mostramos dos columnas, en móvil solo la lista o el chat */
+        @media (min-width: 768px) { .contacts-list { width: 350px; } }
+
+        .contact-item {
+            display: flex; align-items: center; gap: 15px; padding: 15px 20px;
+            border-bottom: 1px solid #111; cursor: pointer; transition: 0.2s;
+        }
+        .contact-item:hover { background: #111; }
+        .contact-item.active { background: #1a1a1a; border-left: 3px solid var(--accent-pink); }
+        .contact-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .contact-info h4 { margin: 0; font-size: 1rem; }
+        .contact-info p { margin: 5px 0 0; font-size: 0.8rem; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 200px; }
+        .time-badge { font-size: 0.7rem; color: #444; }
+
+        /* Área de Chat (Derecha - Oculta en móvil por defecto) */
+        .chat-area {
+            flex: 1; display: none; flex-direction: column; background: #0a0a0a;
+        }
+        @media (min-width: 768px) { .chat-area { display: flex; } }
+
+        .chat-header {
+            padding: 15px 20px; border-bottom: 1px solid #222;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .message-bubble {
+            max-width: 70%; padding: 12px 18px; border-radius: 20px;
+            font-size: 0.95rem; line-height: 1.4;
+        }
+        .msg-sent { background: var(--primary-violet); align-self: flex-end; border-bottom-right-radius: 5px; }
+        .msg-received { background: #222; align-self: flex-start; border-bottom-left-radius: 5px; }
+
+        .chat-input-area {
+            padding: 15px; border-top: 1px solid #222;
+            display: flex; gap: 10px; background: #0f0f0f;
+        }
+        .chat-input {
+            flex: 1; padding: 12px 20px; background: #1a1a1a; border: 1px solid #333;
+            border-radius: 25px; color: white; outline: none; font-family: 'Outfit';
+        }
+        .btn-send {
+            background: var(--accent-pink); border: none; width: 45px; height: 45px;
+            border-radius: 50%; color: white; cursor: pointer; font-size: 1.2rem;
+        }
+
+        /* Estado vacío (PC) */
+        .empty-state { 
+            display: none; flex: 1; justify-content: center; align-items: center; color: #333; 
+            flex-direction: column; text-align: center;
+        }
+        @media (min-width: 768px) { .empty-state { display: flex; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-chat">
+        <a href="dashboard.html" class="btn-back">← Volver</a>
+        <h2>Mensajes</h2>
+        <span style="color: #333;">Nuevo</span>
+    </div>
+
+    <div class="chat-container">
+        
+        <!-- COLUMNA 1: LISTA DE CHATS -->
+        <div class="contacts-list">
+            <div class="contact-item active">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
+                <div class="contact-info">
+                    <h4>MistressNight <i class="fas fa-check-circle" style="color:var(--primary-violet); font-size:0.8rem;"></i></h4>
+                    <p>Hola amor, ya subí el contenido...</p>
+                </div>
+                <span class="time-badge">2m</span>
+            </div>
+
+            <div class="contact-item">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
+                <div class="contact-info">
+                    <h4>Doll_Latex</h4>
+                    <p>Gracias por la propina! 🔥</p>
+                </div>
+                <span class="time-badge">1h</span>
+            </div>
+
+            <div class="contact-item">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
+                <div class="contact-info">
+                    <h4>GoddessAura</h4>
+                    <p>Tu pedido está listo...</p>
+                </div>
+                <span class="time-badge">3h</span>
+            </div>
+        </div>
+
+        <!-- COLUMNA 2: ÁREA DE CHAT (Visible en PC) -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="contact-avatar" style="width:40px; height:40px;">
+                <div>
+                    <h4 style="margin:0;">MistressNight</h4>
+                    <small style="color:#555;">En línea</small>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+                <div class="message-bubble msg-received">Hola amor! Bienvenido a mi reino 👑</div>
+                <div class="message-bubble msg-sent">Hola! Me encanta tu contenido.</div>
+                <div class="message-bubble msg-received">Gracias! He subido un set nuevo exclusivo para ti 🔥</div>
+                <div class="message-bubble msg-sent">Ya lo vi, está increíble!</div>
+                <div class="message-bubble msg-received">Me alegra que te guste. Tengo un video especial por $20 si te animas 😈</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" placeholder="Escribe un mensaje...">
+                <button class="btn-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- Estado vacío si no hay chat seleccionado en PC -->
+        <div class="empty-state" style="display:none;">
+            <h3 style="color:#444;">Selecciona un chat</h3>
+            <p style="color:#333;">Elige una conversación de la izquierda para empezar.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Simulación simple: al hacer clic en un contacto en móvil, mostraríamos el chat
+        // Por simplicidad en esta versión estática, se ve la lista completa en móvil y ambos en PC.
+    </script>
+</body>
+</html>
