@@ -6,157 +6,53 @@
     <title>OBSIDIAN - Registro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-main: #050507;
-            --primary-violet: #7c3aed;
-            --accent-pink: #ec4899;
-            --accent-gold: #fbbf24;
-            --text-white: #ffffff;
-            --text-dim: #71717a;
-        }
-
-        body {
-            margin: 0;
-            background-color: var(--bg-main);
-            color: var(--text-white);
-            font-family: 'Outfit', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* --- FONDOS Y AMBIENTACIÓN --- */
-        .grid-bg {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 60px 60px; z-index: 0;
-        }
-        .glow-orb {
-            position: absolute; border-radius: 50%; filter: blur(120px); z-index: 1; pointer-events: none;
-        }
+        :root { --bg-main: #050507; --primary-violet: #7c3aed; --accent-pink: #ec4899; --accent-gold: #fbbf24; --text-white: #ffffff; --text-dim: #71717a; }
+        body { margin: 0; background-color: var(--bg-main); color: var(--text-white); font-family: 'Outfit', sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        .grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(120px); z-index: 1; pointer-events: none; }
         .orb-1 { width: 500px; height: 500px; background: #2e1065; top: -100px; right: -100px; opacity: 0.4; }
-        .orb-2 { width: 400px; height: 400px; background: #500724; bottom: -100px; left: -100px; opacity: 0.3; }
-        .fog {
-            position: absolute; width: 100%; height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 40%, transparent 60%, rgba(0,0,0,0.8));
-            z-index: 2; pointer-events: none;
-        }
+        .fog { position: absolute; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 40%, transparent 60%, rgba(0,0,0,0.8)); z-index: 2; pointer-events: none; }
 
-        /* --- TARJETA DE REGISTRO --- */
-        .register-card {
-            position: relative; z-index: 10;
-            width: 100%; max-width: 450px;
-            padding: 3rem;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
-            text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        /* LOGO PEQUEÑO (Candado Realista) */
+        .register-card { position: relative; z-index: 10; width: 100%; max-width: 450px; padding: 3rem; background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(20px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7); text-align: center; max-height: 90vh; overflow-y: auto; }
+        
+        /* Mini Logo */
         .logo-mini { width: 60px; height: 80px; margin: 0 auto 25px; position: relative; }
-        .lock-shackle-mini {
-            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 30px; height: 30px; border-radius: 20px 20px 0 0;
-            border: 6px solid transparent;
-            background: linear-gradient(135deg, #444, #222) padding-box, linear-gradient(45deg, #555, #222) border-box;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
-        }
-        .lock-body-mini {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 45px; height: 35px; background: linear-gradient(145deg, #2a2a2a, #111);
-            border-radius: 6px; box-shadow: 0 5px 10px rgba(0,0,0,0.6);
-        }
-        .key-diamond-mini {
-            position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);
-            font-size: 1.2rem; color: #f472b6;
-            filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.6)); z-index: 3;
-        }
+        .lock-shackle-mini { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border-radius: 20px 20px 0 0; border: 6px solid transparent; background: linear-gradient(135deg, #444, #222) padding-box, linear-gradient(45deg, #555, #222) border-box; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); }
+        .lock-body-mini { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 45px; height: 35px; background: linear-gradient(145deg, #2a2a2a, #111); border-radius: 6px; box-shadow: 0 5px 10px rgba(0,0,0,0.6); }
+        .key-diamond-mini { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); font-size: 1.2rem; color: #f472b6; filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.6)); z-index: 3; }
 
         h2 { font-weight: 300; margin: 0 0 20px 0; font-size: 1.8rem; letter-spacing: 1px; }
         p { color: #aaa; margin-bottom: 25px; font-size: 0.9rem; }
-
-        /* INPUTS */
+        
         .input-group { margin-bottom: 15px; text-align: left; }
-        input, select {
-            width: 100%; padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; color: white;
-            font-family: 'Outfit', sans-serif; font-size: 1rem;
-            outline: none; transition: all 0.3s; box-sizing: border-box;
-        }
-        input:focus, select:focus {
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
-        }
-        input::placeholder { color: #555; }
+        input, select { width: 100%; padding: 15px 20px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-family: 'Outfit', sans-serif; font-size: 1rem; outline: none; transition: all 0.3s; box-sizing: border-box; }
+        input:focus, select:focus { border-color: var(--accent-pink); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2); }
         label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; }
 
-        /* SELECTOR DE ROL (Punto 18 y 1) */
-        .role-selector {
-            display: flex; gap: 10px; margin-bottom: 20px;
-        }
-        .role-card {
-            flex: 1; padding: 20px 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .role-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .role-card { flex: 1; padding: 20px 10px; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 15px; cursor: pointer; transition: 0.3s; }
         .role-card:hover { border-color: #555; }
         .role-card.active { border-color: var(--accent-pink); background: rgba(236, 72, 153, 0.1); }
         .role-card h4 { margin: 10px 0 5px; font-size: 1rem; }
         .role-card p { font-size: 0.75rem; color: #666; margin: 0; }
         .role-icon { font-size: 1.5rem; display: block; margin-bottom: 5px; }
         
-        /* TÉRMINOS Y BOTÓN */
-        .terms {
-            display: flex; align-items: flex-start; gap: 10px;
-            font-size: 0.8rem; color: #666; margin-bottom: 20px; text-align: left;
-        }
+        .terms { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; color: #666; margin-bottom: 20px; text-align: left; }
         input[type="checkbox"] { width: auto; accent-color: var(--accent-pink); }
 
-        .btn-register {
-            width: 100%; padding: 15px;
-            border-radius: 12px; border: none;
-            background: white; color: black;
-            font-weight: 700; font-size: 1rem;
-            cursor: pointer; transition: all 0.3s;
-            text-decoration: none; display: block;
-        }
+        .btn-register { width: 100%; padding: 15px; border-radius: 12px; border: none; background: white; color: black; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; text-decoration: none; display: block; }
         .btn-register:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 255, 255, 0.15); }
-        .btn-register:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; box-shadow: none; }
-
+        
         .separator { color: #444; margin: 20px 0; display: flex; align-items: center; gap: 10px; }
         .separator::before, .separator::after { content: ""; flex: 1; height: 1px; background: #222; }
-        
-        .social-btn {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
-            background: transparent; color: white; margin-bottom: 10px; cursor: pointer;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
-
     </style>
 </head>
 <body>
-
     <div class="grid-bg"></div>
     <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
     <div class="fog"></div>
 
     <div class="register-card">
-        <!-- Logo -->
         <div class="logo-mini">
             <div class="lock-shackle-mini"></div>
             <div class="lock-body-mini"></div>
@@ -166,7 +62,6 @@
         <h2>Crear Cuenta</h2>
         <p>Únete a la plataforma de contenido exclusivo.</p>
 
-        <!-- Selección de Rol -->
         <div class="role-selector">
             <div class="role-card active" onclick="selectRole(this, 'fan')">
                 <span class="role-icon">👤</span>
@@ -195,32 +90,23 @@
             <input type="password" placeholder="Mínimo 8 caracteres">
         </div>
 
-        <!-- Términos y Edad (Punto 2) -->
         <div class="terms">
             <input type="checkbox" id="terms">
-            <label for="terms" style="margin:0; cursor:pointer;">
-                Confirmo que soy mayor de 18 años y acepto los <a href="#" style="color:var(--accent-pink)">Términos de Uso</a>.
-            </label>
+            <label for="terms" style="margin:0; cursor:pointer;">Confirmo que soy mayor de 18 años y acepto los términos.</label>
         </div>
 
         <a href="dashboard.html" class="btn-register">CREAR CUENTA</a>
 
         <div class="separator"><span>o</span></div>
 
-        <button class="social-btn">
-            <img src="https://img.icons8.com/color/20/000000/google-logo.png" alt="G"> Registrarse con Google
-        </button>
-
-        <p style="margin-top: 20px; color: #444;">
+        <p style="margin-top: 10px; color: #444;">
             ¿Ya tienes cuenta? <a href="registro.html" style="color: white;">Iniciar Sesión</a>
         </p>
     </div>
 
     <script>
         function selectRole(element, role) {
-            // Quitar activo de todos
             document.querySelectorAll('.role-card').forEach(el => el.classList.remove('active'));
-            // Agregar activo al clickeado
             element.classList.add('active');
             console.log("Rol seleccionado:", role);
         }
