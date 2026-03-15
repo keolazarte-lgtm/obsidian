@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSIDIAN - Explorar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main: #050507; --bg-card: rgba(20, 20, 20, 0.6); --primary-violet: #7c3aed; --accent-pink: #ec4899; --accent-gold: #fbbf24; --text-white: #ffffff; --text-dim: #71717a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-white); min-height: 100vh; position: relative; padding-bottom: 80px; }
+        
+        /* Fondos */
+        .bg-effects { position: fixed; width: 100%; height: 100%; z-index: 0; pointer-events: none; top:0; left:0; }
+        .grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 60px 60px; }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(120px); }
+        .orb-1 { width: 600px; height: 600px; background: #2e1065; top: -200px; left: -200px; opacity: 0.4; }
+
+        /* Header Search */
+        .header-search { position: sticky; top: 0; z-index: 20; background: rgba(5, 5, 7, 0.9); backdrop-filter: blur(20px); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .search-container { position: relative; max-width: 600px; margin: 0 auto; }
+        input.search-bar { width: 100%; padding: 15px 20px 15px 50px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; color: white; font-size: 1rem; outline: none; }
+        .search-bar:focus { background: rgba(0, 0, 0, 0.5); border-color: var(--accent-pink); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #555; }
+        
+        /* Sugerencias */
+        .suggestions-box { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #111; border-radius: 0 0 15px 15px; border: 1px solid #333; border-top: none; overflow: hidden; margin-top: 5px; }
+        .search-bar:focus + .suggestions-box { display: block; }
+        .sug-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #aaa; font-size: 0.9rem; border-bottom: 1px solid #1a1a1a; }
+        .sug-item:hover { background: #1a1a1a; color: white; }
+        .sug-item span.tag { background: var(--primary-violet); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
+
+        /* Categorias */
+        .categories-bar { padding: 15px 20px; white-space: nowrap; overflow-x: auto; background: rgba(5, 5, 7, 0.5); border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; }
+        .cat-chip { display: inline-block; padding: 8px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #aaa; margin-right: 10px; cursor: pointer; }
+        .cat-chip:hover, .cat-chip.active { background: var(--accent-pink); border-color: var(--accent-pink); color: white; box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3); }
+
+        /* Grid */
+        .content-area { position: relative; z-index: 10; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .card { background: var(--bg-card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); text-decoration: none; color: white; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px) scale(1.02); border-color: rgba(255,255,255,0.1); }
+        .card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; filter: brightness(0.8); }
+        .card-info { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .user-name { font-weight: 600; }
+        .user-stats { font-size: 0.8rem; color: #666; }
+        .price-tag { background: var(--accent-gold); color: black; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
+
+        /* Nav Inferior */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000000dd; backdrop-filter: blur(10px); border-top: 1px solid #222; display: flex; justify-content: space-around; padding: 15px; z-index: 100; }
+        .nav-btn { text-align: center; color: #555; text-decoration: none; }
+        .nav-btn.active { color: var(--accent-pink); }
+        .nav-btn i { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+        .nav-btn span { font-size: 0.7rem; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="bg-effects"><div class="grid-bg"></div><div class="glow-orb orb-1"></div></div>
+
+    <div class="header-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-bar" placeholder="Buscar modelos, tags, #BDSM...">
+            <div class="suggestions-box">
+                <div class="sug-item"><i class="fas fa-history"></i> @MistressNight</div>
+                <div class="sug-item"><i class="fas fa-fire" style="color:var(--accent-pink)"></i> <b>BDSM</b> <span class="tag">Tendencia</span></div>
+                <div class="sug-item"><i class="fas fa-search"></i> #Findom</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="categories-bar">
+        <div class="cat-chip active">🔥 Todos</div>
+        <div class="cat-chip">👑 Findom</div>
+        <div class="cat-chip">⛓️ BDSM</div>
+        <div class="cat-chip">👠 Feet</div>
+    </div>
+
+    <div class="content-area">
+        <div class="grid">
+            <a href="perfil.html" class="card">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Modelo">
+                <div class="card-info">
+                    <div><span class="user-name">MistressNight <i class="fas fa-check-circle" style="color:var(--primary-violet); font-size:0.8rem;"></i></span><div class="user-stats">12.4k fans</div></div>
+                    <div class="price-tag">$20</div>
+                </div>
+            </a>
+            <a href="perfil.html" class="card">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80" alt="Modelo">
+                <div class="card-info">
+                    <div><span class="user-name">Doll_Latex <i class="fas fa-check-circle" style="color:var(--primary-violet); font-size:0.8rem;"></i></span><div class="user-stats">8.2k fans</div></div>
+                    <div class="price-tag">$15</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-btn"><i class="fas fa-home"></i><span>Inicio</span></a>
+        <a href="explorar.html" class="nav-btn active"><i class="fas fa-search"></i><span>Buscar</span></a>
+        <a href="perfil.html" class="nav-btn"><i class="fas fa-user"></i><span>Perfil</span></a>
+    </div>
+</body>
+</html>
