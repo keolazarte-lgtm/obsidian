@@ -9,7 +9,7 @@
         :root { --bg-main: #050507; --primary-violet: #7c3aed; --accent-pink: #ec4899; --accent-gold: #fbbf24; --text-white: #ffffff; --text-dim: #71717a; }
         body { font-family: 'Outfit', sans-serif; background-color: var(--bg-main); color: var(--text-white); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        .grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; }
+        .grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1fr); background-size: 60px 60px; z-index: 0; }
         
         /* Header */
         .header { padding: 20px; border-bottom: 1px solid #222; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); z-index: 10; display: flex; align-items: center; gap: 15px; }
@@ -50,6 +50,7 @@
         .menu-item {
             display: flex; align-items: center; justify-content: space-between;
             padding: 15px 0; border-bottom: 1px solid #111; cursor: pointer;
+            text-decoration: none; color: inherit;
         }
         .menu-item:hover { background: rgba(255,255,255,0.02); }
         .menu-left { display: flex; align-items: center; gap: 15px; }
@@ -89,7 +90,7 @@
         <!-- Sección Perfil -->
         <div class="section">
             <div class="profile-card">
-                <div class="avatar-edit">
+                <div class="avatar-edit" onclick="alert('Función para subir foto próximamente')">
                     <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar">
                     <div class="edit-overlay"><i class="fas fa-camera"></i></div>
                 </div>
@@ -108,7 +109,7 @@
                     <span class="balance-label">Saldo Disponible</span>
                     <div class="balance-amount">$125<span class="balance-small">.50</span></div>
                 </div>
-                <button class="btn-withdraw" onclick="alert('Retiro solicitado!')">Retirar</button>
+                <button class="btn-withdraw" onclick="alert('Conectando con Stripe para pagar...')">Retirar</button>
             </div>
         </div>
 
@@ -116,13 +117,13 @@
         <div class="section">
             <div class="section-title">Cuenta</div>
             
-            <div class="menu-item">
+            <a href="perfil.html" class="menu-item">
                 <div class="menu-left">
                     <div class="menu-icon"><i class="fas fa-user-edit"></i></div>
                     <div class="menu-text">Editar Perfil</div>
                 </div>
                 <i class="fas fa-chevron-right menu-arrow"></i>
-            </div>
+            </a>
 
             <div class="menu-item">
                 <div class="menu-left">
@@ -138,7 +139,7 @@
                 </label>
             </div>
 
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Función en desarrollo')">
                 <div class="menu-left">
                     <div class="menu-icon"><i class="fas fa-lock"></i></div>
                     <div class="menu-text">Cambiar Contraseña</div>
@@ -161,20 +162,20 @@
         <!-- Soporte -->
         <div class="section">
             <div class="section-title">Soporte</div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Centro de ayuda próximamente')">
                 <div class="menu-left">
                     <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
                     <div class="menu-text">Centro de Ayuda</div>
                 </div>
                 <i class="fas fa-chevron-right menu-arrow"></i>
             </div>
-            <div class="menu-item">
+            <a href="legal.html" class="menu-item">
                 <div class="menu-left">
                     <div class="menu-icon"><i class="fas fa-file-alt"></i></div>
                     <div class="menu-text">Términos y Privacidad</div>
                 </div>
                 <i class="fas fa-chevron-right menu-arrow"></i>
-            </div>
+            </a>
         </div>
 
         <!-- Cerrar Sesión -->
