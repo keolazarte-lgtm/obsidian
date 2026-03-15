@@ -3,127 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBSIDIAN - Mensajes</title>
+    <title>OBSIDIAN - Chat Seguro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-main: #050507; --primary-violet: #7c3aed; --accent-pink: #ec4899; --text-white: #ffffff; --text-dim: #71717a; }
+        :root { --bg-main: #050507; --primary-violet: #7c3aed; --accent-pink: #ec4899; --accent-gold: #fbbf24; --text-white: #ffffff; --text-dim: #71717a; --success-green: #10b981; }
         body { font-family: 'Outfit', sans-serif; background-color: var(--bg-main); color: var(--text-white); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         /* Header */
-        .header-chat {
-            padding: 20px; border-bottom: 1px solid #222;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); z-index: 10;
-        }
+        .header-chat { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); z-index: 10; }
         .header-chat h2 { margin: 0; font-size: 1.2rem; }
         .btn-back { color: var(--accent-pink); text-decoration: none; font-size: 0.9rem; }
 
-        /* Layout tipo App (2 columnas en PC, 1 en móvil) */
+        /* Layout */
         .chat-container { display: flex; flex: 1; overflow: hidden; }
-        
-        /* Lista de Contactos (Izquierda) */
-        .contacts-list {
-            width: 100%; 
-            overflow-y: auto; 
-            border-right: 1px solid #111;
-        }
-        /* En PC mostramos dos columnas, en móvil solo la lista o el chat */
+        .contacts-list { width: 100%; overflow-y: auto; border-right: 1px solid #111; }
         @media (min-width: 768px) { .contacts-list { width: 350px; } }
-
-        .contact-item {
-            display: flex; align-items: center; gap: 15px; padding: 15px 20px;
-            border-bottom: 1px solid #111; cursor: pointer; transition: 0.2s;
-        }
+        .contact-item { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 1px solid #111; cursor: pointer; }
         .contact-item:hover { background: #111; }
         .contact-item.active { background: #1a1a1a; border-left: 3px solid var(--accent-pink); }
         .contact-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
         .contact-info h4 { margin: 0; font-size: 1rem; }
-        .contact-info p { margin: 5px 0 0; font-size: 0.8rem; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 200px; }
-        .time-badge { font-size: 0.7rem; color: #444; }
 
-        /* Área de Chat (Derecha - Oculta en móvil por defecto) */
-        .chat-area {
-            flex: 1; display: none; flex-direction: column; background: #0a0a0a;
-        }
+        /* Chat Area */
+        .chat-area { flex: 1; display: none; flex-direction: column; background: #0a0a0a; }
         @media (min-width: 768px) { .chat-area { display: flex; } }
 
-        .chat-header {
-            padding: 15px 20px; border-bottom: 1px solid #222;
-            display: flex; align-items: center; gap: 15px;
-        }
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 15px; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .message-bubble {
-            max-width: 70%; padding: 12px 18px; border-radius: 20px;
-            font-size: 0.95rem; line-height: 1.4;
-        }
+        .message-bubble { max-width: 70%; padding: 12px 18px; border-radius: 20px; font-size: 0.95rem; line-height: 1.4; position: relative; }
         .msg-sent { background: var(--primary-violet); align-self: flex-end; border-bottom-right-radius: 5px; }
         .msg-received { background: #222; align-self: flex-start; border-bottom-left-radius: 5px; }
 
-        .chat-input-area {
-            padding: 15px; border-top: 1px solid #222;
-            display: flex; gap: 10px; background: #0f0f0f;
+        /* --- NUEVO: MENSAJES DE SISTEMA (ANTI-FRAUDE) --- */
+        .system-message {
+            align-self: center; background: rgba(0, 0, 0, 0.6); border: 1px solid #333;
+            padding: 12px 20px; border-radius: 10px; text-align: center; margin: 10px 0;
+            max-width: 90%;
         }
-        .chat-input {
-            flex: 1; padding: 12px 20px; background: #1a1a1a; border: 1px solid #333;
-            border-radius: 25px; color: white; outline: none; font-family: 'Outfit';
+        .system-message.success { border-color: var(--success-green); background: rgba(16, 185, 129, 0.1); }
+        .system-icon { font-size: 1.2rem; margin-bottom: 5px; display: block; }
+        .system-text { font-size: 0.85rem; color: #ccc; }
+        .system-highlight { color: var(--success-green); font-weight: 700; }
+
+        /* --- NUEVO: SOLICITUD DE LLAMADA (CAM) --- */
+        .call-request-card {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border: 1px solid var(--primary-violet);
+            padding: 20px; border-radius: 15px; align-self: flex-start; max-width: 250px;
         }
-        .btn-send {
-            background: var(--accent-pink); border: none; width: 45px; height: 45px;
-            border-radius: 50%; color: white; cursor: pointer; font-size: 1.2rem;
+        .call-request-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .call-request-title { font-weight: 700; color: var(--text-white); }
+        .call-request-price { color: var(--accent-gold); font-weight: 700; }
+        .btn-action {
+            width: 100%; padding: 10px; border-radius: 8px; border: none; margin-top: 5px;
+            font-weight: 600; cursor: pointer;
+        }
+        .btn-accept { background: var(--primary-violet); color: white; }
+        .btn-decline { background: transparent; color: #666; margin-top: 8px; border: 1px solid #333; }
+
+        /* --- NUEVO: POPUP DE REEMBOLSO (ANTI-ESTAFA) --- */
+        .refund-popup {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 50;
+            display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
+        }
+        .refund-icon { font-size: 3rem; color: var(--accent-pink); margin-bottom: 20px; }
+        .refund-card {
+            background: #111; border: 1px solid #333; padding: 20px; border-radius: 15px; max-width: 300px; text-align: center;
+        }
+        .refund-title { font-weight: 700; margin-bottom: 10px; color: var(--accent-gold); }
+        .refund-text { font-size: 0.9rem; color: #888; margin-bottom: 20px; }
+        .refund-stamp {
+            border: 2px dashed #444; padding: 10px; border-radius: 5px; color: #666; font-weight: 700; letter-spacing: 1px;
+            margin-top: 10px;
         }
 
-        /* Estado vacío (PC) */
-        .empty-state { 
-            display: none; flex: 1; justify-content: center; align-items: center; color: #333; 
-            flex-direction: column; text-align: center;
-        }
-        @media (min-width: 768px) { .empty-state { display: flex; } }
+        /* Input Area */
+        .chat-input-area { padding: 15px; border-top: 1px solid #222; background: #0f0f0f; display: flex; gap: 10px; }
+        .chat-input { flex: 1; padding: 12px 20px; background: #1a1a1a; border: 1px solid #333; border-radius: 25px; color: white; outline: none; }
+        .btn-send { background: var(--accent-pink); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; font-size: 1.2rem; }
+        
+        /* Quick Actions */
+        .quick-actions { display: flex; gap: 10px; padding: 10px 15px; border-top: 1px solid #111; background: #0a0a0a; }
+        .quick-btn { font-size: 0.8rem; background: #222; border: 1px solid #333; color: #aaa; padding: 5px 12px; border-radius: 15px; cursor: pointer; }
 
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <div class="header-chat">
         <a href="dashboard.html" class="btn-back">← Volver</a>
         <h2>Mensajes</h2>
-        <span style="color: #333;">Nuevo</span>
+        <span style="color: #333;"><i class="fas fa-ellipsis-v"></i></span>
     </div>
 
     <div class="chat-container">
         
-        <!-- COLUMNA 1: LISTA DE CHATS -->
+        <!-- CONTACTOS -->
         <div class="contacts-list">
             <div class="contact-item active">
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
                 <div class="contact-info">
                     <h4>MistressNight <i class="fas fa-check-circle" style="color:var(--primary-violet); font-size:0.8rem;"></i></h4>
-                    <p>Hola amor, ya subí el contenido...</p>
+                    <p>Gracias por la propina!</p>
                 </div>
-                <span class="time-badge">2m</span>
             </div>
-
-            <div class="contact-item">
-                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
+            <!-- Contacto conflictivo (para ejemplo) -->
+            <div class="contact-item" onclick="alert('Usuario bloqueado por intento de fraude.')">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
                 <div class="contact-info">
-                    <h4>Doll_Latex</h4>
-                    <p>Gracias por la propina! 🔥</p>
+                    <h4>User_Falso123</h4>
+                    <p style="color:#aaa;">No leer (Estafa detectada)</p>
                 </div>
-                <span class="time-badge">1h</span>
-            </div>
-
-            <div class="contact-item">
-                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" class="contact-avatar">
-                <div class="contact-info">
-                    <h4>GoddessAura</h4>
-                    <p>Tu pedido está listo...</p>
-                </div>
-                <span class="time-badge">3h</span>
             </div>
         </div>
 
-        <!-- COLUMNA 2: ÁREA DE CHAT (Visible en PC) -->
+        <!-- CHAT AREA -->
         <div class="chat-area">
+            
             <div class="chat-header">
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="contact-avatar" style="width:40px; height:40px;">
                 <div>
@@ -132,31 +130,72 @@
                 </div>
             </div>
 
-            <div class="chat-messages">
-                <div class="message-bubble msg-received">Hola amor! Bienvenido a mi reino 👑</div>
-                <div class="message-bubble msg-sent">Hola! Me encanta tu contenido.</div>
-                <div class="message-bubble msg-received">Gracias! He subido un set nuevo exclusivo para ti 🔥</div>
-                <div class="message-bubble msg-sent">Ya lo vi, está increíble!</div>
-                <div class="message-bubble msg-received">Me alegra que te guste. Tengo un video especial por $20 si te animas 😈</div>
+            <div class="chat-messages" id="chatBox">
+                <div class="message-bubble msg-received">Hola amor! Bienvenido.</div>
+                <div class="message-bubble msg-sent">Hola! Aquí tienes la propina por el video.</div>
+
+                <!-- 1. NOTIFICACIÓN DE PROPINA AUTOMÁTICA (IMPOSIBLE DE FALSIFICAR) -->
+                <div class="system-message success">
+                    <span class="system-icon">💰</span>
+                    <div class="system-text">
+                        <span class="system-highlight">@Fan_Usuario</span> envió una propina de <span class="system-highlight">$5.00 USD</span>.
+                        <br><small style="color:#555;">ID Transacción: #883920 • Confirmado por OBSIDIAN.</small>
+                    </div>
+                </div>
+
+                <div class="message-bubble msg-received">¡Wow! Gracias amor! 💕</div>
+                <div class="message-bubble msg-sent">No es nada. Quiero una llamada cam.</div>
+
+                <!-- 2. SOLICITUD DE LLAMADA CAM (PAGO SEGURO) -->
+                <div class="call-request-card">
+                    <div class="call-request-header">
+                        <i class="fas fa-video" style="color:var(--primary-violet);"></i>
+                        <span class="call-request-title">Solicitud de Videollamada</span>
+                    </div>
+                    <p style="font-size:0.8rem; color:#888; margin:5px 0;">Duración: 10 min</p>
+                    <div class="call-request-price">Precio: $20.00</div>
+                    <button class="btn-action btn-accept" onclick="alert('Pago procesado con seguridad. Iniciando llamada...')">Aceptar y Pagar</button>
+                    <button class="btn-action btn-decline">Rechazar</button>
+                </div>
+                
+                <!-- 3. POPUP DE REEMBOLSO / DENUNCIA -->
+                <div class="refund-popup" id="refundPopup">
+                    <div class="refund-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3 style="color:white;">Centro de Resolución</h3>
+                    <div class="refund-card">
+                        <div class="refund-title">¿El usuario pide un reembolso?</div>
+                        <div class="refund-text">Si el usuario realizó un "Chargeback" o reclamo injustificado, activa la protección automática.</div>
+                        
+                        <button class="btn-action" style="background:var(--accent-pink);" onclick="document.getElementById('stamp').style.display='block'">
+                            <i class="fas fa-shield-alt"></i> Activar Protección Anti-Fraude
+                        </button>
+
+                        <div id="stamp" class="refund-stamp" style="display:none;">
+                            ✅ REEMBOLSO DENEGADO<br>
+                            <span style="font-size:0.7rem; font-weight:300;">Contenido entregado digitalmente.</span>
+                        </div>
+                        
+                        <p style="font-size:0.75rem; color:#555; margin-top:15px;">
+                            El creador recibió $4.25 (descontando comisión).
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="alert('Adjuntar archivo')">📎 Archivo</button>
+                <button class="quick-btn" onclick="document.getElementById('refundPopup').style.display='flex'"><i class="fas fa-exclamation-triangle" style="color:var(--accent-gold);"></i> Fraude</button>
+                <button class="quick-btn" onclick="alert('Enlace de pago enviado.')">$ Cobrar</button>
             </div>
 
             <div class="chat-input-area">
                 <input type="text" class="chat-input" placeholder="Escribe un mensaje...">
                 <button class="btn-send"><i class="fas fa-paper-plane"></i></button>
             </div>
-        </div>
 
-        <!-- Estado vacío si no hay chat seleccionado en PC -->
-        <div class="empty-state" style="display:none;">
-            <h3 style="color:#444;">Selecciona un chat</h3>
-            <p style="color:#333;">Elige una conversación de la izquierda para empezar.</p>
         </div>
-
     </div>
 
-    <script>
-        // Simulación simple: al hacer clic en un contacto en móvil, mostraríamos el chat
-        // Por simplicidad en esta versión estática, se ve la lista completa en móvil y ambos en PC.
-    </script>
 </body>
 </html>
