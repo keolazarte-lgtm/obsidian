@@ -3,98 +3,1030 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBSIDIAN | Private Kingdom</title>
+    <title>OBSIDIAN | BDSM Exclusive Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #0a0a0a; color: #e5e7eb; font-family: 'Inter', sans-serif; }
-        .bg-luxury { background: #161618; border: 1px solid #27272a; }
-        .text-obsidian { color: #a855f7; } /* Violeta Pro */
-        .story-ring { border: 2px solid #a855f7; padding: 2px; }
-        .active-live { background: #ef4444; font-size: 10px; padding: 1px 4px; border-radius: 4px; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); }
+        body { background-color: #050505; color: #e5e7eb; font-family: sans-serif; }
+        .gold-text { color: #d4af37; }
+        .obsidian-violet { color: #7e22ce; }
+        .bg-obsidian { background-color: #0a0a0a; }
+        .border-obsidian { border-color: #1a1a1a; }
+        
+        .contract-scroll::-webkit-scrollbar { width: 6px; }
+        .contract-scroll::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px; }
+        .contract-scroll::-webkit-scrollbar-thumb { background: #7e22ce; border-radius: 3px; }
+        .contract-scroll::-webkit-scrollbar-thumb:hover { background: #6b21a8; }
+        
+        .modal-enter { animation: modalFadeIn 0.3s ease-out; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #7e22ce;
+            border-radius: 4px;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox:checked {
+            background-color: #7e22ce;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .custom-checkbox:hover { border-color: #d4af37; }
+        
+        .input-obsidian {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        .input-obsidian:focus {
+            border-color: #7e22ce;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.2);
+        }
+        .input-obsidian::placeholder { color: #6b7280; }
+        
+        .content-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+        
+        .content-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(12px) brightness(0.6);
+            transition: filter 0.4s ease;
+        }
+        
+        .content-card.unlocked img {
+            filter: none;
+        }
+        
+        .content-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .content-card.unlocked .content-overlay {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .lock-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+            animation: lockPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes lockPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .creator-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(126, 34, 206, 0.8);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .category-tag {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid #d4af37;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #d4af37;
+        }
+        
+        .content-card:hover .content-overlay {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .content-card:hover img {
+            filter: blur(8px) brightness(0.7);
+        }
+        
+        /* STORIES CARRUSEL */
+        .stories-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 16px 0;
+            scrollbar-width: none;
+        }
+        .stories-container::-webkit-scrollbar { display: none; }
+        
+        .story-item {
+            flex-shrink: 0;
+            width: 80px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .story-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .story-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, #7e22ce, #d4af37, #7e22ce);
+            margin: 0 auto 8px;
+        }
+        
+        .story-ring.viewed {
+            background: #333;
+        }
+        
+        .story-ring img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #050505;
+        }
+        
+        .story-name {
+            font-size: 11px;
+            text-align: center;
+            color: #9ca3af;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* STORY VIEWER */
+        .story-viewer {
+            position: fixed;
+            inset: 0;
+            z-50;
+            background: black;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .story-viewer.active {
+            display: flex;
+        }
+        
+        .story-progress {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar.active .progress-fill {
+            animation: progressAnim 5s linear forwards;
+        }
+        
+        @keyframes progressAnim {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            width: 0;
+        }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="min-h-screen flex flex-col">
 
-    <header class="h-16 bg-luxury flex items-center justify-between px-6 sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-black rounded-lg border border-purple-500/30">
-                <i class="fa-solid sho-gem text-obsidian"></i>
+    <!-- ========== AGE GATE ========== -->
+    <div id="age-gate" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-98 p-4">
+        <div class="bg-obsidian border border-purple-900 p-10 rounded-2xl max-w-lg text-center shadow-[0_0_60px_-10px_rgba(126,34,206,0.3)]">
+            <h1 class="text-4xl font-black obsidian-violet mb-6 tracking-tighter underline decoration-gold-text">OBSIDIAN</h1>
+            <p class="mb-8 text-xl text-gray-200">Estás ingresando a una plataforma de contenido <strong>BDSM explícito para adultos</strong>. ¿Eres mayor de 18 años?</p>
+            <div class="flex gap-6 justify-center">
+                <button onclick="closeAgeGate()" class="bg-[#7e22ce] hover:bg-purple-800 text-white px-10 py-3 rounded-full font-bold transition transform hover:scale-105">SÍ, SOY MAYOR</button>
+                <button onclick="window.location.href='https://www.google.com'" class="bg-gray-800 hover:bg-gray-700 text-white px-10 py-3 rounded-full font-bold transition">NO, SALIR</button>
             </div>
-            <h1 class="text-xl font-bold tracking-tighter">OBSIDIAN</h1>
         </div>
-        <div class="flex items-center gap-4 bg-black/40 p-2 rounded-full px-4 border border-zinc-800">
-            <div class="text-right">
-                <p class="text-xs text-zinc-400">Mi Cuenta</p>
-                <p class="text-sm font-semibold">@usuario</p>
+    </div>
+
+    <!-- ========== MODAL REGISTRO CREADORES ========== -->
+    <div id="modal-contrato" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-95 p-4 overflow-y-auto">
+        <div class="bg-obsidian border border-purple-900 rounded-2xl max-w-2xl w-full my-8 shadow-[0_0_80px_-10px_rgba(126,34,206,0.4)] modal-enter">
+            
+            <div class="p-6 border-b border-purple-950 flex justify-between items-center">
+                <h2 class="text-2xl font-bold obsidian-violet">⛓️ Contrato del Creador OBSIDIAN</h2>
+                <button onclick="cerrarModalContrato()" class="text-gray-500 hover:text-white text-2xl transition">&times;</button>
             </div>
-            <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full border border-purple-500">
+            
+            <div class="p-6 contract-scroll max-h-[40vh] overflow-y-auto text-sm text-gray-300 leading-relaxed">
+                <h3 class="text-lg font-bold gold-text mb-4">TÉRMINOS Y CONDICIONES PARA CREADORES</h3>
+                
+                <p class="mb-4"><strong class="text-white">1. OBJETO DEL CONTRATO</strong><br>
+                Este contrato regula la relación entre OBSIDIAN PLATFORM (en adelante "la Plataforma") y el Creador de contenido. Al aceptar, el Creador obtiene un perfil para monetizar contenido BDSM/Kink/Fetish bajo los términos aquí establecidos.</p>
+                
+                <p class="mb-4"><strong class="text-white">2. COMISIÓN DE LA PLATAFORMA</strong><br>
+                OBSIDIAN retiene un <span class="gold-text font-bold">15%</span> de todas las transacciones generadas por el Creador (suscripciones, propinas, ventas de contenido). El Creador recibe el <span class="gold-text font-bold">85%</span> restante en criptomonedas (USDT/BTC/Lightning Network).</p>
+                
+                <p class="mb-4"><strong class="text-white">3. PAGOS Y RETIROS</strong><br>
+                - El mínimo de retiro es de <span class="gold-text font-bold">200 NYRA</span> (equivalente a $20 USD).<br>
+                - Los pagos se procesan dentro de las primeras 48 horas hábiles de solicitado.<br>
+                - El Creador debe proporcionar una wallet de criptomonedas válida.<br>
+                - OBSIDIAN no se responsabiliza por wallets incorrectas proporcionadas por el Creador.</p>
+                
+                <p class="mb-4"><strong class="text-white">4. NORMAS DE CONTENIDO (SSC/RACK)</strong><br>
+                Todo el contenido debe adherirse a los principios <span class="obsidian-violet font-bold">SSC</span> (Safe, Sane, Consensual) y/o <span class="obsidian-violet font-bold">RACK</span> (Risk-Aware Consensual Kink).<br>
+                <span class="text-red-400 font-bold">ESTÁ PROHIBIDO:</span> Contenido no consensual, contenido con menores de edad, bestialidad, necrofilia, sangre real/extrema gore, contenido ilegal según la jurisdicción aplicable.</p>
+                
+                <p class="mb-4"><strong class="text-white">5. VERIFICACIÓN DE EDAD</strong><br>
+                El Creador declara ser mayor de 18 años y presenta documentación válida para verificar su identidad. OBSIDIAN se reserva el derecho de solicitar verificación adicional en cualquier momento.</p>
+                
+                <p class="mb-4"><strong class="text-white">6. INDEPENDENCIA LABORAL</strong><br>
+                El Creador actúa como <span class="text-white">contratista independiente</span>. No existe relación laboral entre OBSIDIAN y el Creador. El Creador es responsable de sus obligaciones fiscales según su país de residencia.</p>
+                
+                <p class="mb-4"><strong class="text-white">7. PROPIEDAD INTELECTUAL</strong><br>
+                El Creador mantiene la propiedad de su contenido. Al subir material, otorga a OBSIDIAN una licencia no exclusiva para mostrar y distribuir dicho contenido dentro de la Plataforma.</p>
+                
+                <p class="mb-4"><strong class="text-white">8. TERMINACIÓN</strong><br>
+                OBSIDIAN puede suspender o eliminar cuentas que violen estos términos sin previo aviso. El Creador puede solicitar la eliminación de su cuenta con 30 días de anticipación.</p>
+                
+                <p class="mb-6"><strong class="text-white">9. JURISDICCIÓN</strong><br>
+                Este contrato se rige por las leyes internacionales de comercio electrónico y propiedad intelectual. Cualquier disputa será resuelta mediante arbitraje internacional.</p>
+                
+                <p class="text-xs text-gray-500 mt-6 border-t border-gray-800 pt-4">
+                    Última actualización: Marzo 2026 | OBSIDIAN PLATFORM © Todos los derechos reservados
+                </p>
+            </div>
+            
+            <div id="paso-contrato" class="p-6 border-t border-purple-950">
+                <p class="text-sm text-gray-400 mb-4 uppercase tracking-widest">Para continuar, debes aceptar:</p>
+                
+                <div class="space-y-4 mb-6">
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="check-edad" class="custom-checkbox mt-1 flex-shrink-0">
+                        <span class="text-gray-300 group-hover:text-white transition">Confirmo que <strong class="text-white">soy mayor de 18 años</strong> y tengo capacidad legal para firmar este contrato.</span>
+                    </label>
+                    
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="check-comision" class="custom-checkbox mt-1 flex-shrink-0">
+                        <span class="text-gray-300 group-hover:text-white transition">Acepto la comisión del <strong class="gold-text">15%</strong> para OBSIDIAN y entiendo que recibiré el <strong class="gold-text">85%</strong> en criptomonedas.</span>
+                    </label>
+                    
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="check-consenso" class="custom-checkbox mt-1 flex-shrink-0">
+                        <span class="text-gray-300 group-hover:text-white transition">Declaro que <strong class="obsidian-violet">todo mi contenido será 100% consensual</strong> y cumpliré con las normas SSC/RACK.</span>
+                    </label>
+                </div>
+                
+                <button onclick="verificarCheckboxes()" class="w-full bg-[#7e22ce] hover:bg-purple-800 disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold uppercase tracking-widest transition transform hover:scale-[1.02]">
+                    Aceptar y Continuar
+                </button>
+            </div>
+            
+            <div id="paso-formulario" class="p-6 border-t border-purple-950 hidden">
+                <p class="text-sm text-gray-400 mb-6 uppercase tracking-widest">Completa tu perfil de Creador:</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Nombre de Usuario (Alias) *</label>
+                        <input type="text" id="input-alias" placeholder="Ej: MistressDark, SubBoy99..." class="input-obsidian w-full px-4 py-3 rounded-xl">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Email *</label>
+                        <input type="email" id="input-email" placeholder="tu@email.com" class="input-obsidian w-full px-4 py-3 rounded-xl">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Contraseña *</label>
+                        <input type="password" id="input-password" placeholder="Mínimo 8 caracteres" class="input-obsidian w-full px-4 py-3 rounded-xl">
+                    </div>
+                </div>
+                
+                <button onclick="finalizarRegistro()" class="w-full bg-[#d4af37] hover:bg-yellow-600 text-black py-4 rounded-xl font-bold uppercase tracking-widest transition transform hover:scale-[1.02] mt-6">
+                    ⛓️ Finalizar Registro
+                </button>
+            </div>
+            
+            <div id="paso-exito" class="p-8 text-center hidden">
+                <div class="text-6xl mb-4">🖤</div>
+                <h3 class="text-2xl font-bold gold-text mb-4">¡Bienvenido a la Oscuridad!</h3>
+                <p class="text-gray-400 mb-6">Tu perfil está siendo revisado. Te notificaremos por email cuando sea aprobado.</p>
+                <button onclick="cerrarModalContrato()" class="bg-[#7e22ce] hover:bg-purple-800 text-white px-8 py-3 rounded-full font-bold transition">
+                    Entendido
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ========== MODAL SALDO INSUFICIENTE ========== -->
+    <div id="modal-saldo" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-90 p-4">
+        <div class="bg-obsidian border border-[#d4af37] rounded-2xl max-w-md w-full p-8 text-center shadow-[0_0_60px_-10px_rgba(212,175,55,0.3)] modal-enter">
+            <div class="text-5xl mb-4">⚠️</div>
+            <h3 class="text-2xl font-bold gold-text mb-4">Saldo Insuficiente</h3>
+            <p class="text-gray-400 mb-6">No tienes NYRA suficientes para desbloquear este contenido VIP.</p>
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-6">
+                <p class="text-sm text-gray-500 mb-2">Tu saldo actual:</p>
+                <p class="text-3xl font-bold text-gray-300"><span class="gold-text" id="saldo-modal">0</span> NYRA</p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="cerrarModalSaldo()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl font-bold transition">
+                    Cancelar
+                </button>
+                <button onclick="abrirCargaNyra()" class="flex-1 bg-[#d4af37] hover:bg-yellow-600 text-black py-3 rounded-xl font-bold transition">
+                    Cargar NYRA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL CARGA NYRA ========== -->
+    <div id="modal-nyra" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-95 p-4 overflow-y-auto">
+        <div class="bg-obsidian border border-purple-900 rounded-2xl max-w-lg w-full my-8 shadow-[0_0_80px_-10px_rgba(126,34,206,0.4)] modal-enter">
+            
+            <div class="p-6 border-b border-purple-950 flex justify-between items-center">
+                <h2 class="text-2xl font-bold gold-text">💎 Cargar NYRA</h2>
+                <button onclick="cerrarModalNyra()" class="text-gray-500 hover:text-white text-2xl transition">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <p class="text-sm text-gray-400 mb-4 uppercase tracking-widest">Seleccioná tu pack:</p>
+                
+                <div class="space-y-3">
+                    <button onclick="seleccionarPack(100, 10)" class="pack-btn w-full bg-gray-900 border border-gray-800 hover:border-purple-600 p-4 rounded-xl flex justify-between items-center transition group">
+                        <div class="text-left">
+                            <p class="text-xl font-bold text-white">100 <span class="gold-text">NYRA</span></p>
+                            <p class="text-sm text-gray-500">Ideal para probar</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold gold-text">$10 USD</p>
+                            <p class="text-xs text-gray-600">≈ 0.00015 BTC</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="seleccionarPack(500, 50)" class="pack-btn w-full bg-gray-900 border-2 border-[#d4af37] p-4 rounded-xl flex justify-between items-center transition group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-[#d4af37] text-black text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
+                        <div class="text-left">
+                            <p class="text-xl font-bold text-white">500 <span class="gold-text">NYRA</span></p>
+                            <p class="text-sm text-gray-500">+50 NYRA de regalo</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold gold-text">$50 USD</p>
+                            <p class="text-xs text-gray-600">≈ 0.00075 BTC</p>
+                        </div>
+                    </button>
+                    
+                    <button onclick="seleccionarPack(1000, 100)" class="pack-btn w-full bg-gray-900 border border-gray-800 hover:border-purple-600 p-4 rounded-xl flex justify-between items-center transition group">
+                        <div class="text-left">
+                            <p class="text-xl font-bold text-white">1000 <span class="gold-text">NYRA</span></p>
+                            <p class="text-sm text-gray-500">+150 NYRA de regalo</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold gold-text">$100 USD</p>
+                            <p class="text-xs text-gray-600">≈ 0.0015 BTC</p>
+                        </div>
+                    </button>
+                </div>
+                
+                <div id="wallet-info" class="mt-6 p-4 bg-gray-900 border border-gray-800 rounded-xl hidden">
+                    <p class="text-sm text-gray-400 mb-3">Enviá USDT (Polygon/TRC20) a esta wallet:</p>
+                    <div class="bg-black p-3 rounded-lg flex items-center justify-between gap-2">
+                        <code id="wallet-address" class="text-sm gold-text break-all">0x742d35Cc6634C0532925a3b844Bc9e7595f2bD45</code>
+                        <button onclick="copiarWallet()" class="text-gray-400 hover:text-white transition">📋</button>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-3 text-center">Una vez confirmada la transacción, tus NYRA se acreditarán automáticamente.</p>
+                </div>
+                
+                <button onclick="cerrarModalNyra()" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl font-bold mt-6 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== STORY VIEWER ========== -->
+    <div id="story-viewer" class="story-viewer">
+        <div class="story-progress" id="story-progress"></div>
+        <button onclick="cerrarStoryViewer()" class="absolute top-6 right-6 text-white text-3xl z-10">&times;</button>
+        <div class="relative w-full h-full flex items-center justify-center">
+            <img id="story-image" src="" alt="Story" class="max-h-full max-w-full object-contain">
+            <div class="absolute bottom-8 left-0 right-0 text-center">
+                <p id="story-creator" class="text-white font-bold"></p>
+                <p id="story-time" class="text-gray-400 text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== HEADER ========== -->
+    <header class="bg-obsidian border-b border-purple-950 p-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- LOGO OBSIDIAN -->
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">🖤</div>
+                <div>
+                    <div class="text-2xl font-black tracking-tighter obsidian-violet">OBSIDIAN</div>
+                    <div class="text-[10px] text-gray-600 italic -mt-1">BDSM Niche Platform</div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-2 text-sm">
+                    <span class="text-gray-500">Tu saldo:</span>
+                    <span class="gold-text font-bold"><span id="saldo-display">0</span> NYRA</span>
+                </div>
+                <div class="hidden md:block text-sm border-l border-gray-800 pl-6">
+                    <span class="text-gray-500">Tasa:</span> <span class="gold-text font-bold">10 NYRA = 1 USD</span>
+                </div>
+                <button onclick="panicButton()" title="Botón de Pánico" class="bg-gray-900 hover:bg-purple-950 p-3 rounded-full border border-purple-900 transition group">
+                    <span class="text-xl">🔒</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="flex max-w-7xl mx-auto mt-6 px-4 gap-6">
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
         
-        <aside class="w-64 hidden lg:block space-y-4">
-            <div class="bg-luxury p-4 rounded-2xl space-y-3">
-                <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Programados</p>
-                <div class="flex items-center gap-3 p-2 hover:bg-zinc-800 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-image text-amber-500"></i>
-                    <div><p class="text-sm">Set de fotos</p><p class="text-[10px] text-zinc-500">Hoy 20:00</p></div>
+        <!-- STORIES SECTION -->
+        <section class="mb-8">
+            <h3 class="text-lg font-bold obsidian-violet mb-4">📜 Historias <span class="text-gray-500 text-sm font-normal">(24h)</span></h3>
+            <div class="stories-container" id="stories-container">
+                <!-- Stories se cargan dinámicamente -->
+                <div class="text-gray-500 text-sm">Cargando historias...</div>
+            </div>
+        </section>
+
+        <!-- HERO SECTION -->
+        <div class="text-center mb-16 pt-8 border-t border-gray-900">
+            <h2 class="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">Tu placer, <span class="gold-text">tus reglas.</span></h2>
+            <p class="text-xl md:text-2xl text-gray-400 mb-14 max-w-3xl mx-auto">La plataforma de nicho BDSM con la comisión más baja del mercado y privacidad total.</p>
+
+            <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                <div class="bg-obsidian p-10 border border-purple-950 rounded-2xl hover:border-purple-700 transition text-left group">
+                    <h3 class="text-3xl font-bold mb-4 obsidian-violet group-hover:scale-105 transition-transform">Para Creadores 🔥</h3>
+                    <ul class="text-base text-gray-400 mb-8 space-y-3">
+                        <li>• Quédate con el <strong class="gold-text">85%</strong> de tus ganancias (Neto).</li>
+                        <li>• Pagos 100% en Criptomonedas (USDT/BTC/Lightning).</li>
+                        <li>• Libertad total para contenido Kink, FET y BDSM.</li>
+                    </ul>
+                    <button onclick="abrirModalContrato()" class="w-full bg-[#7e22ce] py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-purple-800 transition">Registrarme</button>
                 </div>
-                <div class="flex items-center gap-3 p-2 hover:bg-zinc-800 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-video text-red-500"></i>
-                    <div><p class="text-sm">Live: Q&A</p><p class="text-[10px] text-zinc-500">Mañana 18:00</p></div>
+
+                <div class="bg-obsidian p-10 border border-purple-950 rounded-2xl hover:border-[#d4af37] transition text-left group">
+                    <h3 class="text-3xl font-bold mb-4 gold-text group-hover:scale-105 transition-transform">Para Fans 🖤</h3>
+                    <ul class="text-base text-gray-400 mb-8 space-y-3">
+                        <li>• Compra <strong class="gold-text">NYRA</strong> de forma anónima y discreta.</li>
+                        <li>• Sin rastros en tu banco ni resúmenes de tarjeta (100% Crypto).</li>
+                        <li>• Contenido exclusivo de Doms, Subs, Switches y Performers.</li>
+                    </ul>
+                    <button onclick="abrirModalNyra()" class="w-full bg-gray-800 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-gray-700 transition">Entrar / Recargar</button>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <main class="flex-1 max-w-2xl">
-            <div class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
-                <div class="flex flex-col items-center gap-1 min-w-[70px]">
-                    <div class="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center border-2 border-dashed border-zinc-600">
-                        <i class="fa-solid fa-plus text-zinc-400"></i>
-                    </div>
-                    <span class="text-[10px]">Tú</span>
-                </div>
-                <div class="flex flex-col items-center gap-1 min-w-[70px] relative">
-                    <div class="w-16 h-16 rounded-full story-ring cursor-pointer">
-                        <img src="https://via.placeholder.com/60" class="rounded-full">
-                    </div>
-                    <span class="active-live">LIVE</span>
-                    <span class="text-[10px] text-purple-400 font-bold">Mistress</span>
-                </div>
+        <!-- ========== GALERÍA DE CONTENIDO EXCLUSIVO ========== -->
+        <section class="mt-12">
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-bold mb-3">Contenido <span class="obsidian-violet">Exclusivo</span> 🔞</h3>
+                <p class="text-gray-500">Desbloqueá el contenido VIP de nuestros creadores con NYRA</p>
             </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto" id="content-grid">
+                <!-- Contenido se carga dinámicamente -->
+                <div class="text-gray-500 text-center py-8 col-span-full">Cargando contenido...</div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button onclick="cargarMasContenido()" class="bg-gray-900 hover:bg-gray-800 border border-purple-900 px-8 py-3 rounded-full font-bold text-gray-400 hover:text-white transition">
+                    Ver más contenido →
+                </button>
+            </div>
+        </section>
 
-            <div class="bg-luxury rounded-3xl overflow-hidden mb-6">
-                <div class="p-4 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-full">
-                        <div>
-                            <p class="font-bold flex items-center gap-1">Mistress Aurora <i class="fa-solid fa-circle-check text-blue-400 text-[10px]"></i></p>
-                            <p class="text-xs text-zinc-500">@mistress_aurora</p>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-black border-t border-purple-950 p-10 mt-16">
+        <div class="max-w-7xl mx-auto text-[11px] text-gray-600 text-center leading-relaxed">
+            <p class="mb-5 gold-text font-bold text-sm tracking-widest uppercase">ADVERTENCIA LEGAL +18</p>
+            <p>OBSIDIAN es una plataforma tecnológica de alojamiento de contenido para adultos. Todo el material es generado por usuarios independientes bajo su propia responsabilidad. Tenemos TOLERANCIA CERO ante contenido no consensual, ilegal o de menores. OBSIDIAN actúa como intermediario técnico y no posee relación laboral con los creadores. Los <strong>NYRA</strong> son créditos de software interno no reembolsables. Al usar este sitio, aceptas nuestras normas de seguridad SSC (Safe, Sane, Consensual).</p>
+            <p class="mt-5 text-xs text-gray-700">&copy; 2026 OBSIDIAN PLATFORM. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script>
+        // ===== CONFIGURACIÓN SUPABASE =====
+        const SUPABASE_URL = 'TU_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ===== VARIABLES GLOBALES =====
+        let currentUser = null;
+        let saldoNyra = 0;
+        let contenidoCargado = [];
+        let historiasCargadas = [];
+        
+        // ===== INICIALIZACIÓN =====
+        window.onload = async function() {
+            // Verificar Age Gate
+            const cookies = document.cookie.split(';');
+            const verified = cookies.some(c => c.trim().startsWith('obsidian_age_verified=true'));
+            if (verified) {
+                document.getElementById('age-gate').classList.add('hidden');
+            }
+            
+            // Cargar datos
+            await cargarUsuarioActual();
+            await cargarHistorias();
+            await cargarContenido();
+        };
+        
+        // ===== AUTH =====
+        async function cargarUsuarioActual() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            currentUser = user;
+            
+            if (currentUser) {
+                await cargarSaldo();
+            }
+        }
+        
+        async function cargarSaldo() {
+            if (!currentUser) {
+                saldoNyra = 0;
+                actualizarDisplaySaldo();
+                return;
+            }
+            
+            const { data, error } = await supabaseClient
+                .from('nyra_balance')
+                .select('balance')
+                .eq('user_id', currentUser.id)
+                .single();
+            
+            if (data) {
+                saldoNyra = data.balance || 0;
+                actualizarDisplaySaldo();
+            }
+        }
+        
+        function actualizarDisplaySaldo() {
+            document.getElementById('saldo-display').textContent = saldoNyra;
+        }
+        
+        // ===== AGE GATE =====
+        function closeAgeGate() {
+            document.getElementById('age-gate').classList.add('hidden');
+            const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
+            document.cookie = `obsidian_age_verified=true; expires=${expiry}; path=/; SameSite=Strict`;
+        }
+        
+        // ===== BOTÓN DE PÁNICO =====
+        function panicButton() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'https://www.google.com';
+        }
+        
+        // ===== HISTORIAS =====
+        async function cargarHistorias() {
+            const container = document.getElementById('stories-container');
+            
+            // Query: historias que no expiraron
+            const now = new Date().toISOString();
+            const { data: stories, error } = await supabaseClient
+                .from('stories')
+                .select('id, media_url, created_at, expires_at, creator_id, profiles!stories_creator_id_fkey(alias, avatar_url)')
+                .gte('expires_at', now)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
+            if (error) {
+                console.error('Error cargando historias:', error);
+                container.innerHTML = '<div class="text-gray-500 text-sm">Error al cargar historias</div>';
+                return;
+            }
+            
+            if (!stories || stories.length === 0) {
+                container.innerHTML = '<div class="text-gray-500 text-sm">No hay historias activas</div>';
+                return;
+            }
+            
+            historiasCargadas = stories;
+            
+            // Agrupar por creador
+            const creators = {};
+            stories.forEach(story => {
+                const creatorId = story.creator_id;
+                if (!creators[creatorId]) {
+                    creators[creatorId] = {
+                        alias: story.profiles?.alias || 'Anónimo',
+                        avatar: story.profiles?.avatar_url || story.media_url,
+                        stories: []
+                    };
+                }
+                creators[creatorId].stories.push(story);
+            });
+            
+            // Renderizar
+            container.innerHTML = Object.entries(creators).map(([id, creator]) => `
+                <div class="story-item" onclick="abrirStoryViewer('${id}')">
+                    <div class="story-ring">
+                        <img src="${creator.avatar}" alt="${creator.alias}" onerror="this.src='https://placehold.co/72x72/1a1a1a/7e22ce?text=🖤'">
+                    </div>
+                    <div class="story-name">${creator.alias}</div>
+                </div>
+            `).join('');
+        }
+        
+        function abrirStoryViewer(creatorId) {
+            const viewer = document.getElementById('story-viewer');
+            const creator = Object.values(historiasCargadas.reduce((acc, s) => {
+                if (!acc[s.creator_id]) acc[s.creator_id] = { alias: s.profiles?.alias, stories: [] };
+                acc[s.creator_id].stories.push(s);
+                return acc;
+            }, {})).find((_, i) => Object.keys(historiasCargadas.reduce((acc, s) => {
+                if (!acc[s.creator_id]) acc[s.creator_id] = true;
+                return acc;
+            }, {}))[i] === creatorId);
+            
+            if (!creator || creator.stories.length === 0) return;
+            
+            const story = creator.stories[0];
+            document.getElementById('story-image').src = story.media_url;
+            document.getElementById('story-creator').textContent = creator.alias;
+            
+            const timeAgo = getTimeAgo(new Date(story.created_at));
+            document.getElementById('story-time').textContent = timeAgo;
+            
+            // Progress bars
+            const progressContainer = document.getElementById('story-progress');
+            progressContainer.innerHTML = creator.stories.map((_, i) => `
+                <div class="progress-bar ${i === 0 ? 'active' : ''}">
+                    <div class="progress-fill"></div>
+                </div>
+            `).join('');
+            
+            viewer.classList.add('active');
+            
+            // Auto-close después de 5 segundos
+            setTimeout(() => {
+                cerrarStoryViewer();
+            }, 5000);
+        }
+        
+        function cerrarStoryViewer() {
+            document.getElementById('story-viewer').classList.remove('active');
+        }
+        
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Ahora';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+            return `${Math.floor(seconds / 86400)}d`;
+        }
+        
+        // ===== CONTENIDO =====
+        async function cargarContenido() {
+            const grid = document.getElementById('content-grid');
+            
+            const { data: content, error } = await supabaseClient
+                .from('content')
+                .select('id, media_url, thumbnail_url, price_nyra, category, creator_id, profiles!content_creator_id_fkey(alias, avatar_url)')
+                .eq('is_locked', true)
+                .order('created_at', { ascending: false })
+                .limit(12);
+            
+            if (error) {
+                console.error('Error cargando contenido:', error);
+                grid.innerHTML = '<div class="text-gray-500 text-center py-8 col-span-full">Error al cargar contenido</div>';
+                return;
+            }
+            
+            if (!content || content.length === 0) {
+                grid.innerHTML = '<div class="text-gray-500 text-center py-8 col-span-full">No hay contenido disponible</div>';
+                return;
+            }
+            
+            contenidoCargado = content;
+            
+            // Verificar contenido ya desbloqueado
+            let unlockedIds = [];
+            if (currentUser) {
+                const { data: unlocked } = await supabaseClient
+                    .from('unlocked_content')
+                    .select('content_id')
+                    .eq('user_id', currentUser.id);
+                unlockedIds = unlocked?.map(u => u.content_id) || [];
+            }
+            
+            grid.innerHTML = content.map(item => {
+                const isUnlocked = unlockedIds.includes(item.id);
+                return `
+                    <div class="content-card ${isUnlocked ? 'unlocked' : ''}" id="card-${item.id}">
+                        <img src="${item.thumbnail_url || item.media_url}" alt="Contenido VIP" onerror="this.src='https://placehold.co/400x533/1a1a1a/7e22ce?text=VIP'">
+                        <div class="content-overlay">
+                            <span class="lock-icon">🔒</span>
+                        </div>
+                        <div class="creator-badge">
+                            <span>👤</span> ${item.profiles?.alias || 'Anónimo'}
+                        </div>
+                        <div class="category-tag">${item.category || 'VIP'}</div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                            <button onclick="desbloquearContenido('${item.id}', ${item.price_nyra})" 
+                                    class="w-full ${isUnlocked ? 'bg-green-700 cursor-default' : 'bg-[#d4af37] hover:bg-yellow-600'} text-black py-2 rounded-lg font-bold text-sm transition"
+                                    ${isUnlocked ? 'disabled' : ''}>
+                                ${isUnlocked ? '✅ Desbloqueado' : `🔓 Desbloquear por ${item.price_nyra} NYRA`}
+                            </button>
                         </div>
                     </div>
-                    <span class="text-[10px] text-zinc-500">19/3/2026</span>
-                </div>
-                <div class="px-4 pb-3">
-                    <p class="text-sm text-zinc-300">Nueva sesión de bondage disponible exclusivamente para suscriptores premium. ✨ Prepárense para algo realmente intenso...</p>
-                </div>
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800" class="w-full aspect-square object-cover">
-            </div>
-        </main>
+                `;
+            }).join('');
+        }
+        
+        async function cargarMasContenido() {
+            alert('Próximamente más contenido exclusivo...');
+        }
+        
+        // ===== DESBLOQUEO =====
+        async function desbloquearContenido(contentId, precio) {
+            if (!currentUser) {
+                alert('⚠️ Debes iniciar sesión para desbloquear contenido.');
+                return;
+            }
+            
+            // Recargar saldo actual
+            await cargarSaldo();
+            
+            if (saldoNyra < precio) {
+                abrirModalSaldo();
+                return;
+            }
+            
+            // Descontar saldo en DB
+            const nuevoSaldo = saldoNyra - precio;
+            
+            const { error: updateError } = await supabaseClient
+                .from('nyra_balance')
+                .update({ balance: nuevoSaldo, updated_at: new Date().toISOString() })
+                .eq('user_id', currentUser.id);
+            
+            if (updateError) {
+                console.error('Error actualizando saldo:', updateError);
+                alert('Error al procesar. Intenta nuevamente.');
+                return;
+            }
+            
+            // Registrar desbloqueo
+            const { error: insertError } = await supabaseClient
+                .from('unlocked_content')
+                .insert({
+                    user_id: currentUser.id,
+                    content_id: contentId,
+                    price_paid: precio,
+                    unlocked_at: new Date().toISOString()
+                });
+            
+            if (insertError) {
+                console.error('Error registrando desbloqueo:', insertError);
+            }
+            
+            // Actualizar UI
+            saldoNyra = nuevoSaldo;
+            actualizarDisplaySaldo();
+            
+            const card = document.getElementById(`card-${contentId}`);
+            if (card) {
+                card.classList.add('unlocked');
+                const btn = card.querySelector('button');
+                btn.textContent = '✅ Desbloqueado';
+                btn.disabled = true;
+                btn.classList.remove('bg-[#d4af37]', 'hover:bg-yellow-600');
+                btn.classList.add('bg-green-700', 'cursor-default');
+            }
+            
+            // Registrar transacción
+            await supabaseClient.from('transactions').insert({
+                user_id: currentUser.id,
+                type: 'purchase',
+                amount_nyra: -precio,
+                status: 'completed',
+                created_at: new Date().toISOString()
+            });
+            
+            console.log(`Contenido ${contentId} desbloqueado por ${precio} NYRA`);
+        }
+        
+        // ===== MODALES REGISTRO =====
+        function abrirModalContrato() {
+            const modal = document.getElementById('modal-contrato');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
 
-        <aside class="w-72 hidden xl:block space-y-4">
-            <nav class="bg-luxury rounded-3xl p-4 space-y-1">
-                <a href="#" class="flex items-center gap-4 p-3 bg-purple-500/10 text-obsidian rounded-2xl"><i class="fa-solid fa-house"></i> Inicio</a>
-                <a href="#" class="flex items-center gap-4 p-3 hover:bg-zinc-800 rounded-2xl text-zinc-400"><i class="fa-solid fa-message"></i> Mensajes <span class="ml-auto bg-purple-600 text-white text-[10px] px-2 rounded-full">3</span></a>
-                <a href="#" class="flex items-center gap-4 p-3 hover:bg-zinc-800 rounded-2xl text-zinc-400"><i class="fa-solid fa-bell"></i> Notificaciones <span class="ml-auto bg-purple-600 text-white text-[10px] px-2 rounded-full">5</span></a>
-                <hr class="border-zinc-800 my-2">
-                <a href="#" class="flex items-center gap-4 p-3 hover:bg-zinc-800 rounded-2xl text-zinc-400"><i class="fa-solid fa-vault"></i> Bóveda</a>
-                <a href="#" class="flex items-center gap-4 p-3 hover:bg-zinc-800 rounded-2xl text-zinc-400"><i class="fa-solid fa-wallet"></i> Wallet</a>
-            </nav>
-        </aside>
+        function cerrarModalContrato() {
+            const modal = document.getElementById('modal-contrato');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+            resetModalContrato();
+        }
 
-    </div>
+        function resetModalContrato() {
+            document.getElementById('check-edad').checked = false;
+            document.getElementById('check-comision').checked = false;
+            document.getElementById('check-consenso').checked = false;
+            document.getElementById('input-alias').value = '';
+            document.getElementById('input-email').value = '';
+            document.getElementById('input-password').value = '';
+            document.getElementById('paso-contrato').classList.remove('hidden');
+            document.getElementById('paso-formulario').classList.add('hidden');
+            document.getElementById('paso-exito').classList.add('hidden');
+        }
 
+        function verificarCheckboxes() {
+            const checkEdad = document.getElementById('check-edad').checked;
+            const checkComision = document.getElementById('check-comision').checked;
+            const checkConsenso = document.getElementById('check-consenso').checked;
+            
+            if (!checkEdad || !checkComision || !checkConsenso) {
+                alert('⚠️ Debes marcar todas las casillas para continuar.');
+                return;
+            }
+            
+            document.getElementById('paso-contrato').classList.add('hidden');
+            document.getElementById('paso-formulario').classList.remove('hidden');
+        }
+
+        async function finalizarRegistro() {
+            const alias = document.getElementById('input-alias').value.trim();
+            const email = document.getElementById('input-email').value.trim();
+            const password = document.getElementById('input-password').value;
+            
+            if (!alias) {
+                alert('⚠️ El nombre de usuario es obligatorio.');
+                return;
+            }
+            if (!email || !email.includes('@')) {
+                alert('⚠️ Ingresa un email válido.');
+                return;
+            }
+            if (!password || password.length < 8) {
+                alert('⚠️ La contraseña debe tener al menos 8 caracteres.');
+                return;
+            }
+            
+            // Registrar en Supabase Auth
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        alias: alias,
+                        role: 'creator'
+                    }
+                }
+            });
+            
+            if (error) {
+                alert('⚠️ Error: ' + error.message);
+                return;
+            }
+            
+            // Crear perfil
+            if (data.user) {
+                await supabaseClient.from('profiles').insert({
+                    id: data.user.id,
+                    alias: alias,
+                    email: email,
+                    role: 'creator',
+                    created_at: new Date().toISOString()
+                });
+                
+                // Crear balance inicial
+                await supabaseClient.from('nyra_balance').insert({
+                    user_id: data.user.id,
+                    balance: 0,
+                    total_purchased: 0,
+                    total_spent: 0,
+                    updated_at: new Date().toISOString()
+                });
+            }
+            
+            document.getElementById('paso-formulario').classList.add('hidden');
+            document.getElementById('paso-exito').classList.remove('hidden');
+        }
+
+        // ===== MODAL SALDO =====
+        function abrirModalSaldo() {
+            document.getElementById('saldo-modal').textContent = saldoNyra;
+            const modal = document.getElementById('modal-saldo');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalSaldo() {
+            const modal = document.getElementById('modal-saldo');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function abrirCargaNyra() {
+            cerrarModalSaldo();
+            abrirModalNyra();
+        }
+
+        // ===== MODAL NYRA =====
+        function abrirModalNyra() {
+            const modal = document.getElementById('modal-nyra');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalNyra() {
+            const modal = document.getElementById('modal-nyra');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+            document.getElementById('wallet-info').classList.add('hidden');
+        }
+
+        function seleccionarPack(nyra, usd) {
+            document.getElementById('wallet-info').classList.remove('hidden');
+            document.getElementById('wallet-info').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function copiarWallet() {
+            const address = document.getElementById('wallet-address').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                alert('✅ Dirección de wallet copiada al portapapeles');
+            }).catch(() => {
+                alert('Error al copiar. Copiá manualmente: ' + address);
+            });
+        }
+        
+        // ===== TECLAS =====
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModalContrato();
+                cerrarModalSaldo();
+                cerrarModalNyra();
+                cerrarStoryViewer();
+            }
+        });
+    </script>
 </body>
 </html>
